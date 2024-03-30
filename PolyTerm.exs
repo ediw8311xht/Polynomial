@@ -1,6 +1,7 @@
 #!/bin/elixir
 
 defmodule PolyTerm do
+    @group_regex ~r{(?<coe>^[-0-9]+)?(?<var>[a-z])?[\^]?(?<exp>[-0-9]+$)?}
     @def_coe  1
     @def_exp  1
     @def_var  ""
@@ -17,7 +18,6 @@ defmodule PolyTerm do
 
     def new(c, v, e \\ @def_var), do: %PolyTerm{coe: c, var: v, exp: e}
 
-    @group_regex ~r{(?<coe>^[-0-9]+)?(?<var>[a-z])?[\^]?(?<exp>[-0-9]+$)?}
     def new(s) do
         %{"coe" => c, "var" => v, "exp" => e} = Regex.named_captures(@group_regex, s)
         if v == "" do
@@ -26,7 +26,6 @@ defmodule PolyTerm do
             Kernel.apply(PolyTerm, :new, [parsebit(c), v, parsebit(e)])
         end
     end
-
 
     def value(polyterm, var) do
         polyterm.coe * (var ** polyterm.exp)
@@ -43,6 +42,20 @@ defmodule PolyTerm do
     def can_add(_, _), do: false
 
     def degree(%PolyTerm{exp: e}), do: e
+
+    def divide(%PolyTerm{var: v1}, %PolyTerm{var: v2})
+        when v1 != v2, do: :error
+
+    def divide(%PolyTerm{var: v1, exp: e1, coe: c1}, %PolyTerm{var: v2, exp: e2, coe: c2})
+        when e1 < e2 or (e1 == e2 and c1 < c2), do: %PolyTerm{var: v2, exp: e2, coe: c2}
+
+    def divide(%PolyTerm{var: v1, exp: e1, coe: c1}, %PolyTerm{var: v2, exp: e2, coe: c2}) do
+        %PolyTerm{var: v1, exp: e1 / e2, coe: c1 - c2}
+    end
+
+    def compare(%PolyTerm{exp: e1, coe: c1}, %PolyTerm{exp: e2, coe: c2}) do
+        e1 > e2 or (e1 == e2 and c1 > c2)
+    end
 
 end
 
