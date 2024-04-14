@@ -24,8 +24,12 @@ defmodule Main do
         #|> IO.puts()
     end
     def main(_) do
-        Polynomial.new("3x^5 4x^2 9x^5")
+        Polynomial.new("8 3x^5 2x 4x^2 9x^5 9 10x")
         |> Polynomial.simplify()
+        |> Polynomial.sort()
+        Fraction.new(3, 5)
+        |> Fraction.simplify()
+        #Helper.is_factor([15, 5], 3)
     end
 end
 

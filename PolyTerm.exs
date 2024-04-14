@@ -5,7 +5,6 @@
     "Helper.exs"        ,
 ]
 |> Enum.each(&Code.require_file/1)
-
 defmodule PolyTerm do
     @group_regex ~r{(?<coe>^[-0-9]+)?(?<var>[a-z])?[\^]?(?<exp>[-0-9]+$)?}
     @def_coe  1; @def_exp  1; @def_var  ""

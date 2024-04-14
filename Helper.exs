@@ -6,21 +6,11 @@ defmodule Helper do
         n |> :math.sqrt |> ceil
     end
 
-    def is_factor(l, n)
-    when is_list(l) and is_integer(n) do
-        Enum.all?(l, &( rem(&1, n) == 0 ) )
-    end
+    def is_factor(l, n), do: Enum.all?(l, &( rem(&1, n) == 0 ) )
 
-    def gcf(l)
-    when is_list(l) do
-        Enum.min(l)
-        |> sqrtceil()
-        |> Range.new(2)
-        |> Enum.find(1, &(is_factor(l, &1)))
-    end
+    def gcf(l), do: Enum.find(Enum.min(l)..1, 1, &(is_factor(l, &1)))
 
-    def simplify_by_gcf(l)
-    when is_list(l) do
+    def simplify_by_gcf(l) do
         f = gcf(l)
         Enum.map(l, &(round(&1 / f)))
     end

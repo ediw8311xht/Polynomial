@@ -35,9 +35,7 @@ defmodule Polynomial do
         |> Polynomial.new()
     end
 
-    def simplify(%Polynomial{figures: figs}) do
-        Enum.reduce(figs, Polynomial.new(), fn x, acc -> Polynomial.add(acc, x) end)
-    end
+    def simplify(%Polynomial{figures: figs}), do: Enum.reduce(figs, Polynomial.new(), fn x, acc -> Polynomial.add(acc, x) end)
 
     #------------DIVISION---------#
     def division(p1 = %Polynomial{}, p2 = %Polynomial{}), do: internal_division(sort(p1), sort(p2))
@@ -53,6 +51,7 @@ defmodule Polynomial do
     end
 
     defp divide_step(s1 = %Polynomial{}, s2 = %Polynomial{}) do
+        [s1, s2]
     end
     #-----------------------------#
 

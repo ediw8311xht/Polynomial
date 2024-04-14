@@ -19,8 +19,12 @@ defmodule Fraction do
     end
 
     def simplify(%Fraction{num: n, den: d}) do
-        {sn, sd} = Helper.simplify_by_gcf([n, d])
+        [sn, sd] = Helper.simplify_by_gcf([n, d])
         Fraction.new(sn, sd)
     end
+end
+
+defimpl String.Chars, for: Fraction do
+    def to_string(%Fraction{num: n, den: d}), do: "#{n}/#{d}"
 end
 
