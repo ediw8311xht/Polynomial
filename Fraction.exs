@@ -9,6 +9,7 @@ defmodule Fraction do
     defstruct num: 0, den: 1
 
     def new(num, den), do: %Fraction{num: num, den: den}
+    def new(s) when is_list(s),    do: apply(&Fraction.new/2, s)
     def new(s) when is_integer(s), do: Fraction.new(s, 1)
     def new(s) when is_binary(s) do
         case Regex.named_captures(@capture_regex, s) do
@@ -18,10 +19,7 @@ defmodule Fraction do
         end
     end
 
-    def simplify(%Fraction{num: n, den: d}) do
-        [sn, sd] = Helper.simplify_by_gcf([n, d])
-        Fraction.new(sn, sd)
-    end
+    def simplify(%Fraction{num: n, den: d}), do: Helper.simplify_by_gcf([n, d]) |> Fraction.new()
 end
 
 defimpl String.Chars, for: Fraction do
