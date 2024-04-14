@@ -1,23 +1,31 @@
 #!/bin/elixir
 
-Code.require_file("Polynomial.exs")
-
+[
+    "Polynomial.exs"        ,
+    "PolyTerm.exs"          ,
+    "Fraction.exs"          ,
+    "Helper.exs"            ,
+]
+|> Enum.each(&Code.require_file/1)
 defmodule Main do
+    @moduledoc """
+    """
     def main([p1 | [p2]]) do
-        p1 = Polynomial.new_simplify(p1)
-        p2 = Polynomial.new_simplify(p2)
-        #|> Polynomial.sort()
-        #IO.inspect(p1)
-        l1 = Polynomial.leading_term(p1)
-        l2 = Polynomial.leading_term(p2)
-        IO.puts("#{l1}, #{l2}")
-        Polynomial.division(p1, p2)
-        |> IO.inspect()
-        PolyTerm.divide(l1, l2)
-        |> IO.inspect()
+        n1 = Polynomial.new(p1)
+        n2 = Polynomial.new(p2)
+        IO.inspect(n1)
+        IO.inspect(n2)
+        #l1 = Polynomial.leading_term(p1)
+        #l2 = Polynomial.leading_term(p2)
+        ##IO.puts("#{l1}, #{l2}")
+        ##Polynomial.division(p1, p2)
+        ##|> IO.pust()
+        #PolyTerm.divide(l1, l2)
+        #|> IO.puts()
     end
     def main(_) do
-        :error
+        Polynomial.new("3x^5 4x^2 9x^5")
+        |> Polynomial.simplify()
     end
 end
 
