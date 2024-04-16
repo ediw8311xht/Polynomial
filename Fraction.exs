@@ -27,6 +27,19 @@ defmodule Fraction do
     end
 
     def to_float(%Fraction{num: n, den: d}), do: n / d
+
+    def compare(f1 = %Fraction{}, f2 = %Fraction{}) do
+        case for n <- [f1, f2], do: Fraction.to_float(n) do
+            {x, y} when x > y -> :gt
+            {x, y} when x < y -> :lt
+            _                 -> :eq
+        end
+    end
+
+    def add(%Fraction{num: n1, den: d1}, %Fraction{num: n2, den: d2}) do
+        Fraction.new((n1 * d2) + (n2 * d1), d1 * d2)
+        |> Fraction.simplify()
+    end
 end
 
 defimpl String.Chars, for: Fraction do
@@ -34,4 +47,3 @@ defimpl String.Chars, for: Fraction do
     def to_string(%Fraction{num: n, den: d}), do: "#{n}/#{d}"
     #def to_integer
 end
-

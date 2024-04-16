@@ -25,11 +25,15 @@ defmodule PolyTerm do
 
     def value(polyterm, var), do: Fraction.to_float(polyterm.coe) * (var ** polyterm.exp)
 
-    def add(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2})
-        when v1 != v2 or e1 != e2, do: :nil
+    def add(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2}) when v1 != v2 or e1 != e2, do: :nil
 
-    def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2}), do: PolyTerm.new(c1 + c2, v1, e1)
+    def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2}) do
+        PolyTerm.new(Fraction.add(c1 + c2), v1, e1)
+    end
 
+    def compare(%PolyTerm{exp: e1, coe: c1}, %PolyTerm{exp: e2, coe: c2}) do
+        e1 > e2 or (e1 == e2 and c1 > c2)
+    end
 
     def divide(%PolyTerm{var: v1}, %PolyTerm{var: v2})
         when v1 != v2, do: :error
@@ -39,9 +43,6 @@ defmodule PolyTerm do
         PolyTerm.new(c1 / c2, v1, e1 - e2)
     end
 
-    def compare(%PolyTerm{exp: e1, coe: c1}, %PolyTerm{exp: e2, coe: c2}) do
-        e1 > e2 or (e1 == e2 and c1 > c2)
-    end
 end
 
 defimpl String.Chars, for: PolyTerm do

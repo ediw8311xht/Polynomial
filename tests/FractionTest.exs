@@ -16,4 +16,11 @@ defmodule FractionTest do
         a = Fraction.new("9/18") |> Fraction.simplify()
         assert a.num == 1 and a.den == 2
     end
+
+    test "Fraction Add" do
+        a = Fraction.new("9/18")
+        b = Fraction.new("3/4")
+        c = Fraction.add(a, b) |> Fraction.to_float()
+        assert c == 1.25
+    end
 end
