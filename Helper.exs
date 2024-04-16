@@ -15,8 +15,8 @@ defmodule Helper do
         Enum.map(l, &(round(&1 / f)))
     end
 
-    def parsebit(""), do: 1
-    def parsebit(x) do
+    def toint(""), do: 1
+    def toint(x) do
         case Integer.parse(x) do
             {a, ""}  -> a
             :error   -> x

@@ -27,7 +27,7 @@ defmodule Main do
         Polynomial.new("8 3x^5 2x 4x^2 9x^5 9 10x")
         |> Polynomial.simplify()
         |> Polynomial.sort()
-        Fraction.new(3, 9)
+        Fraction.new(15, 5)
         |> Fraction.simplify()
         #Helper.is_factor([15, 5], 3)
     end

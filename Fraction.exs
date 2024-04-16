@@ -5,24 +5,33 @@
 ]
 |> Enum.each(&Code.require_file/1)
 defmodule Fraction do
-    @capture_regex ~r{^(?<num>[0-9]+)/(?<den>[0-9]+)$}
     defstruct num: 0, den: 1
 
     def new(num, den), do: %Fraction{num: num, den: den}
-    def new(s) when is_list(s),    do: apply(&Fraction.new/2, s)
-    def new(s) when is_integer(s), do: Fraction.new(s, 1)
+    def new([a, b]),   do: Fraction.new(a, b)
+    def new(n) when is_integer(n),   do: Fraction.new(n, 1)
     def new(s) when is_binary(s) do
-        case Regex.named_captures(@capture_regex, s) do
-            %{"num" => num, "den" => den} ->
-                Fraction.new(String.to_integer(num), String.to_integer(den))
-            _ -> :error
+        String.split(s, "/")
+        |> Stream.map(&String.trim/1)
+        |> Enum.map(&String.to_integer/1)
+        |> case do
+            [n, d]  -> Fraction.new(n, d)
+            [n]     -> Fraction.new(n)
+            _       -> :error
         end
     end
 
-    def simplify(%Fraction{num: n, den: d}), do: Helper.simplify_by_gcf([n, d]) |> Fraction.new()
+    def simplify(%Fraction{num: n, den: d}) do
+        Helper.simplify_by_gcf([n, d])
+        |> Fraction.new()
+    end
+
+    def to_float(%Fraction{num: n, den: d}), do: n / d
 end
 
 defimpl String.Chars, for: Fraction do
+    def to_string(%Fraction{num: n, den: 1}), do: "#{n}"
     def to_string(%Fraction{num: n, den: d}), do: "#{n}/#{d}"
+    #def to_integer
 end
 

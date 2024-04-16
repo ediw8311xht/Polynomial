@@ -6,21 +6,24 @@
 ]
 |> Enum.each(&Code.require_file/1)
 defmodule PolyTerm do
-    @group_regex ~r{(?<coe>^[-0-9]+)?(?<var>[a-z])?[\^]?(?<exp>[-0-9]+$)?}
-    @def_coe  1; @def_exp  1; @def_var  ""
-    defstruct coe: @def_coe, var: @def_var, exp: @def_exp
+    @group_regex ~r{(?<coe>^[-0-9]+)?(?<frac>[/][-0-9]+)?(?<var>[a-z])?[\^]?(?<exp>[-0-9]+$)?}
+    @def_exp 1
+    defstruct coe: 1, var: "", exp: 1
 
-    def new(c, v, e \\ @def_var), do: %PolyTerm{coe: c, var: v, exp: e}
-
-    def new(s) do
-        %{"coe" => c, "var" => v, "exp" => e} = Regex.named_captures(@group_regex, s)
-        a = [Helper.parsebit(c), v, (if v == "", do: 1, else: Helper.parsebit(e))]
-        Kernel.apply(PolyTerm, :new, a)
+    def new(c = %Fraction{}, v, e),     do: %PolyTerm{coe: c, var: v, exp: e}
+    def new(c, v, e) when is_number(c), do: PolyTerm.new(Fraction.new(c), v, e)
+    def new(c, v),                      do: PolyTerm.new(c, v, @def_exp)
+    def new(coe: c, var: v, exp: e),    do: PolyTerm.new(c, v, e)
+    def new(s) when is_binary(s) do
+        %{"coe" => c, "frac" => f, "var" => v, "exp" => e} = Regex.named_captures(@group_regex, s)
+        #a = [Helper.parsebit(c), v, (if v == "", do: 1, else: Helper.parsebit(e))]
+        #Kernel.apply(PolyTerm, :new, a)
+        PolyTerm.new(Fraction.new(c <> f), v, Helper.toint(e))
     end
 
     def degree(%PolyTerm{exp: e}), do: e
 
-    def value(polyterm, var), do: polyterm.coe * (var ** polyterm.exp)
+    def value(polyterm, var), do: Fraction.to_float(polyterm.coe) * (var ** polyterm.exp)
 
     def add(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2})
         when v1 != v2 or e1 != e2, do: :nil
