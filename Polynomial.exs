@@ -7,14 +7,15 @@
 ]
 |> Enum.each(&Code.require_file/1)
 defmodule Polynomial do
-    @scanregex ~r/([-0-9]*[a-z](?:[\^][0-9]+)?|\b[-0-9]+\b)/
+    @scanregex ~r{([-0-9/]*[a-z]?(?:[\^][0-9]+)?|\b[-0-9]+\b)}
     defstruct figures: []
 
-    def new(), do: %Polynomial{figures: []}
+    def new(),                   do: %Polynomial{figures: []}
     def new(p) when is_list(p),  do: %Polynomial{figures: p}
     def new(p) when is_binary(p) do
         Regex.scan(@scanregex, p, capture: :first)
         |> List.flatten()
+        |> Enum.filter(&(&1 != ""))
         |> Enum.map( &(PolyTerm.new(&1)))
         |> Polynomial.new()
     end
@@ -42,7 +43,7 @@ defmodule Polynomial do
 
     defp internal_division(s1 = %Polynomial{}, s2 = %Polynomial{}, result \\ %Polynomial{figures: []}) do
         l1 = leading_term(s1); l2 = leading_term(s2)
-        if PolyTerm.compare(l1, l2) do
+        if PolyTerm.compare(l1, l2) in [:gt, :eq] do
             divide_step(s1, s2)
             #|> internal_division()
         else

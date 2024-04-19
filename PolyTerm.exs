@@ -28,19 +28,21 @@ defmodule PolyTerm do
     def add(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2}) when v1 != v2 or e1 != e2, do: :nil
 
     def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2}) do
-        PolyTerm.new(Fraction.add(c1 + c2), v1, e1)
+        PolyTerm.new(Fraction.add(c1, c2), v1, e1)
     end
 
     def compare(%PolyTerm{exp: e1, coe: c1}, %PolyTerm{exp: e2, coe: c2}) do
-        e1 > e2 or (e1 == e2 and c1 > c2)
+        cond do
+            e1 > e2     -> :gt
+            e1 < e2     -> :lt
+            e1 == e2    -> Fraction.compare(c1, c2)
+        end
     end
 
-    def divide(%PolyTerm{var: v1}, %PolyTerm{var: v2})
-        when v1 != v2, do: :error
-    def divide(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, var: _v2, exp: e2})
-        when e1 < e2 or (e1 == e2 and c1 < c2), do: PolyTerm.new(c2, v1, e2)
+    def divide(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2}) when v1 != v2 or e1 < e2, do: :error
+
     def divide(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, var: _v2, exp: e2}) do
-        PolyTerm.new(c1 / c2, v1, e1 - e2)
+        PolyTerm.new(Fraction.divide(c1, c2), v1, e1 - e2)
     end
 
 end
@@ -54,3 +56,5 @@ defimpl String.Chars, for: PolyTerm do
     end
 end
 
+#PolyTerm.new("3/5x^2")
+#|>IO.inspect()

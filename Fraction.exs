@@ -7,8 +7,8 @@
 defmodule Fraction do
     defstruct num: 0, den: 1
 
-    def new(num, den), do: %Fraction{num: num, den: den}
-    def new([a, b]),   do: Fraction.new(a, b)
+    def new(n, d),      do: %Fraction{num: n, den: d} |> Fraction.simplify()
+    def new([n, d]),    do: Fraction.new(n, d)
     def new(n) when is_integer(n),   do: Fraction.new(n, 1)
     def new(s) when is_binary(s) do
         String.split(s, "/")
@@ -22,11 +22,13 @@ defmodule Fraction do
     end
 
     def simplify(%Fraction{num: n, den: d}) do
-        Helper.simplify_by_gcf([n, d])
-        |> Fraction.new()
+        [sn, sd] = Helper.simplify_by_gcf([n, d])
+        %Fraction{num: sn, den: sd}
     end
 
     def to_float(%Fraction{num: n, den: d}), do: n / d
+
+    def inverse(%Fraction{num: n, den: d}), do: Fraction.new(d, n)
 
     def compare(f1 = %Fraction{}, f2 = %Fraction{}) do
         case for n <- [f1, f2], do: Fraction.to_float(n) do
@@ -37,9 +39,16 @@ defmodule Fraction do
     end
 
     def add(%Fraction{num: n1, den: d1}, %Fraction{num: n2, den: d2}) do
-        Fraction.new((n1 * d2) + (n2 * d1), d1 * d2)
-        |> Fraction.simplify()
+        Fraction.new((n1 * d2) + (n2 * d1), d1 * d2) |> Fraction.simplify()
     end
+
+    def multiply(%Fraction{num: n1, den: d1}, %Fraction{num: n2, den: d2}) do
+        Fraction.new(n1 * n2, d1 * d2)
+    end
+
+    def divide(f1, f2), do: Fraction.multiply(f1, Fraction.inverse(f2))
+
+    def power(%Fraction{num: n, den: d}, power), do: Fraction.new(n ** power, d ** power)
 end
 
 defimpl String.Chars, for: Fraction do
@@ -47,3 +56,4 @@ defimpl String.Chars, for: Fraction do
     def to_string(%Fraction{num: n, den: d}), do: "#{n}/#{d}"
     #def to_integer
 end
+

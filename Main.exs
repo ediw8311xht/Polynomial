@@ -24,15 +24,21 @@ defmodule Main do
         #|> IO.puts()
     end
     def main(_) do
-        Polynomial.new("8 3x^5 2x 4x^2 9x^5 9 10x")
+        Polynomial.new("8/5 3x^5 2x 4x^2 9x^5 -9 10x")
         |> Polynomial.simplify()
-        |> Polynomial.sort()
-        Fraction.new(15, 5)
-        |> Fraction.simplify()
+        |> IO.puts()
+        #|> Polynomial.sort()
+        #Fraction.new(15, 5)
+        #Helper.gcf([15, 5])
+        #Enum.min([15, 5])..1//-1
+        #Enum.min([15, 5])
+        #Helper.simplify_by_gcf([15, 5])
+        #|> Fraction.simplify()
         #Helper.is_factor([15, 5], 3)
+        #IO.puts("HI")
     end
 end
 
 System.argv()
 |> Main.main()
-|> IO.puts()
+|> IO.inspect()
