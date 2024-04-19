@@ -21,6 +21,7 @@ defmodule Fraction do
         end
     end
 
+    def simplify(%Fraction{num: 0, den: _d}), do: %Fraction{num: 0, den: 1}
     def simplify(%Fraction{num: n, den: d}) do
         [sn, sd] = Helper.simplify_by_gcf([n, d])
         %Fraction{num: sn, den: sd}
@@ -32,8 +33,8 @@ defmodule Fraction do
 
     def compare(f1 = %Fraction{}, f2 = %Fraction{}) do
         case for n <- [f1, f2], do: Fraction.to_float(n) do
-            {x, y} when x > y -> :gt
-            {x, y} when x < y -> :lt
+            [x, y] when x > y -> :gt
+            [x, y] when x < y -> :lt
             _                 -> :eq
         end
     end
@@ -52,8 +53,9 @@ defmodule Fraction do
 end
 
 defimpl String.Chars, for: Fraction do
-    def to_string(%Fraction{num: n, den: 1}), do: "#{n}"
-    def to_string(%Fraction{num: n, den: d}), do: "#{n}/#{d}"
+    def to_string(%Fraction{num: n, den: -1}),  do: "-#{n}"
+    def to_string(%Fraction{num: n, den:  1}),  do:  "#{n}"
+    def to_string(%Fraction{num: n, den:  d}),  do:  "#{n}/#{d}"
     #def to_integer
 end
 

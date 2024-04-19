@@ -23,4 +23,11 @@ defmodule FractionTest do
         c = Fraction.add(a, b) |> Fraction.to_float()
         assert c == 1.25
     end
+
+    test "Zero Result" do
+        a = Fraction.new("15/5")
+        b = Fraction.new("-15/5")
+        c = Fraction.add(a, b) |> Fraction.to_float()
+        assert c == 0
+    end
 end

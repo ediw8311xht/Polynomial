@@ -63,6 +63,7 @@ defimpl String.Chars, for: Polynomial do
         Enum.reduce(figs, "", fn x, acc ->
             acc <> String.Chars.to_string(x) <> " "
         end)
+        |> String.trim()
     end
 end
 
