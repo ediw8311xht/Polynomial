@@ -79,16 +79,16 @@ defmodule Polynomial do
     defp divide_step(s1 = %Polynomial{}, s2 = %Polynomial{}) do
         l1 = leading_term(s1); l2 = leading_term(s2)
         if l1.exp < l2.exp do
-            {false, s1}
+            {false, Polynomial.simplify(s1)}
         else
             quotient = PolyTerm.divide(l1, l2)
             remainder = Polynomial.subtract(s1, Polynomial.multiply(quotient, s2))
-            #{quotient, remainder}
+            IO.inspect({"G", remainder})
             case divide_step(remainder, s2) do
                 {false, r} ->
                     {Polynomial.new([quotient]), Polynomial.combine(remainder, r)}
                 {q, r} ->
-                    {Polynomial.add(q, quotient), Polynomial.combine(remainder, r)}
+                    {Polynomial.add(q, quotient), r}
             end
         end
     end

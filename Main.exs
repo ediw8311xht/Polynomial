@@ -27,7 +27,9 @@ defmodule Main do
         num = Polynomial.new("2x^3 + -3x^2 + 4x + 5")
         den = Polynomial.new("x + 2")
         #den
-        Polynomial.divide(num, den)
+        {x, y} = Polynomial.divide(num, den)
+        IO.puts(x)
+        IO.puts(y)
         #Polynomial.subtract(num, den)
         #IO.puts(Polynomial.simplify(num))
         #Polynomial.simplify(den)
