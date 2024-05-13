@@ -18,33 +18,52 @@ defmodule PolyTerm do
         %{"coe" => c, "frac" => f, "var" => v, "exp" => e} = Regex.named_captures(@group_regex, s)
         #a = [Helper.parsebit(c), v, (if v == "", do: 1, else: Helper.parsebit(e))]
         #Kernel.apply(PolyTerm, :new, a)
-        PolyTerm.new(Fraction.new(c <> f), v, Helper.toint(e))
+        if v == "" do
+            PolyTerm.new(Fraction.new(c <> f), "", 0)
+        else
+            PolyTerm.new(Fraction.new(c <> f), v, Helper.toint(e))
+        end
     end
 
     def degree(%PolyTerm{exp: e}), do: e
 
     def value(polyterm, var), do: Fraction.to_float(polyterm.coe) * (var ** polyterm.exp)
 
-    def add(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2}) when v1 != v2 or e1 != e2, do: :nil
-
-    def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2}) do
-        PolyTerm.new(Fraction.add(c1, c2), v1, e1)
-    end
-
     def compare(%PolyTerm{exp: e1, coe: c1}, %PolyTerm{exp: e2, coe: c2}) do
+        t1 = Fraction.sign(c1) * e1
+        t2 = Fraction.sign(c2) * e2
         cond do
-            e1 > e2     -> :gt
-            e1 < e2     -> :lt
-            e1 == e2    -> Fraction.compare(c1, c2)
+            t1 >  t2    -> :gt
+            t1 <  t2    -> :lt
+            t1 == t2    -> Fraction.compare(c1, c2)
         end
     end
 
-    def divide(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2}) when v1 != v2 or e1 < e2, do: :error
-
-    def divide(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, var: _v2, exp: e2}) do
-        PolyTerm.new(Fraction.divide(c1, c2), v1, e1 - e2)
+    def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, var: v2, exp: e2}) do
+        if v1 != v2 or e1 != e2 do
+            :nil
+        else
+            PolyTerm.new(Fraction.add(c1, c2), v1, e1)
+        end
     end
 
+
+    def divide(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, var: v2, exp: e2}) do
+        if v1 != v2 and (v1 != "" and v2 != "") do
+            :nil
+        else
+            PolyTerm.new(Fraction.divide(c1, c2), max(v1, v2), e1 - e2)
+        end
+    end
+
+    def multiply(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, var: v2, exp: e2}) do
+        if v1 != v2 and (v1 != "" and v2 != "") do
+            :nil
+        else
+            PolyTerm.new(Fraction.multiply(c1, c2), max(v1, v2), e1 + e2)
+        end
+    end
+    def not_zero(%PolyTerm{coe: c1}), do: Fraction.not_zero(c1)
 end
 
 defimpl String.Chars, for: PolyTerm do

@@ -24,10 +24,23 @@ defmodule Main do
         #|> IO.puts()
     end
     def main(_) do
-        Polynomial.new("-8/5 3x^5 2x 4x^2 9x^5 -9 10x")
-        |> Polynomial.simplify()
-        |> Polynomial.sort()
-        |> String.Chars.to_string()
+        num = Polynomial.new("7x^5 8x^4")
+        den = Polynomial.new("5x + 4")
+        #den
+        Polynomial.divide(num, den)
+        #Polynomial.subtract(num, den)
+        #IO.puts(Polynomial.simplify(num))
+        #Polynomial.simplify(den)
+        #Polynomial.multiply(a, den)
+        #num = PolyTerm.new("8")
+        #Polynomial.new("5")
+        #|> IO.puts()
+        #[Polynomial.leading_term(num), Polynomial.leading_term(den)]
+        #Polynomial.leading_term(test1)
+        #l1 = Polynomial.leading_term(num)
+        #l2 = Polynomial.leading_term(den)
+        #PolyTerm.divide(l1, l2)
+
         #|> Polynomial.simplify()
         #|> IO.puts()
         #a = Fraction.new(-15, 5)

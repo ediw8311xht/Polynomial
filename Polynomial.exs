@@ -11,7 +11,7 @@ defmodule Polynomial do
     defstruct figures: []
 
     def new(),                   do: %Polynomial{figures: []}
-    def new(p) when is_list(p),  do: %Polynomial{figures: p}
+    def new(p) when is_list(p),  do: %Polynomial{figures: Enum.filter(p, &PolyTerm.not_zero/1)}
     def new(p) when is_binary(p) do
         Regex.scan(@scanregex, p, capture: :first)
         |> List.flatten()
@@ -22,6 +22,10 @@ defmodule Polynomial do
 
     def leading_term(%Polynomial{figures: figs}), do: Enum.max_by(figs, &(&1.exp))
 
+    def combine(%Polynomial{figures: figs1}, %Polynomial{figures: figs2}) do
+        Polynomial.new(figs1 ++ figs2) |> Polynomial.simplify()
+    end
+
     def prepend(%Polynomial{figures: figs}, p = %PolyTerm{}), do: Polynomial.new([p | figs])
 
     def add(polynomial = %Polynomial{figures: figs}, polyterm = %PolyTerm{}) do
@@ -31,28 +35,62 @@ defmodule Polynomial do
         end
     end
 
+    def subtract(poly = %Polynomial{}, %Polynomial{figures: figs2}) do
+        Enum.map(figs2, &(PolyTerm.multiply(&1, PolyTerm.new(-1, "", 0))))
+        |> Polynomial.new()
+        |> Polynomial.combine(poly)
+    end
+
     def sort(%Polynomial{figures: figs}) do
         Enum.sort(figs, &(PolyTerm.degree(&1) >= PolyTerm.degree(&2)))
         |> Polynomial.new()
     end
 
-    def simplify(%Polynomial{figures: figs}), do: Enum.reduce(figs, Polynomial.new(), fn x, acc -> Polynomial.add(acc, x) end)
-
-    #------------DIVISION---------#
-    def division(p1 = %Polynomial{}, p2 = %Polynomial{}), do: internal_division(sort(p1), sort(p2))
-
-    defp internal_division(s1 = %Polynomial{}, s2 = %Polynomial{}, result \\ %Polynomial{figures: []}) do
-        l1 = leading_term(s1); l2 = leading_term(s2)
-        if PolyTerm.compare(l1, l2) in [:gt, :eq] do
-            divide_step(s1, s2)
-            #|> internal_division()
-        else
-            result
-        end
+    def simplify(%Polynomial{figures: figs}) do
+        Enum.reduce(figs, Polynomial.new(), fn x, acc -> Polynomial.add(acc, x) end)
+        |> Polynomial.sort()
     end
 
+    def multiply(%Polynomial{figures: figs}, poly2 = %Polynomial{}) do
+        Enum.reduce(figs, Polynomial.new(), fn term, acc -> 
+            Polynomial.combine(acc, Polynomial.multiply(term, poly2))
+        end)
+        |> Polynomial.new()
+    end
+
+    def multiply(term = %PolyTerm{}, %Polynomial{figures: figs}) do
+        Enum.map(figs, &(PolyTerm.multiply(&1, term)))
+        |> Polynomial.new()
+    end
+
+    #------------DIVISION---------#
+    def divide(p1 = %Polynomial{}, p2 = %Polynomial{}), do: divide_step(simplify(p1), simplify(p2))
+
+    #defp internal_divide(s1 = %Polynomial{}, s2 = %Polynomial{}, result \\ %Polynomial{figures: []}) do
+    #    case divide_step(s1, s2) do
+    #        {true,  quotient, remainder} -> 
+    #            Polynomial.combine(result, quotient)
+    #            |> internal_divide(remainder, s2)
+    #        {false, x} -> 
+    #            Polynomial.combine(result, x)
+    #    end
+    #end
+
     defp divide_step(s1 = %Polynomial{}, s2 = %Polynomial{}) do
-        [s1, s2]
+        l1 = leading_term(s1); l2 = leading_term(s2)
+        if l1.exp < l2.exp do
+            {false, s1}
+        else
+            quotient = PolyTerm.divide(l1, l2)
+            remainder = Polynomial.subtract(s1, Polynomial.multiply(quotient, s2))
+            #{quotient, remainder}
+            case divide_step(remainder, s2) do
+                {false, r} ->
+                    {Polynomial.new([quotient]), Polynomial.combine(remainder, r)}
+                {q, r} ->
+                    {Polynomial.add(q, quotient), Polynomial.combine(remainder, r)}
+            end
+        end
     end
     #-----------------------------#
 

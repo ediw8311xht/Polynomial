@@ -20,17 +20,13 @@ defmodule Fraction do
             _       -> :error
         end
     end
-
-    def simplify(%Fraction{num: 0, den: _d}), do: %Fraction{num: 0, den: 1}
-    def simplify(%Fraction{num: n, den: d}) do
+    def simplify(  %Fraction{num: 0, den: _d}  ), do: %Fraction{num: 0, den: 1}
+    def simplify(  %Fraction{num: n, den: d}   ) do
         [sn, sd] = Helper.simplify_by_gcf([n, d])
         %Fraction{num: sn, den: sd}
     end
-
-    def to_float(%Fraction{num: n, den: d}), do: n / d
-
-    def inverse(%Fraction{num: n, den: d}), do: Fraction.new(d, n)
-
+    def to_float( %Fraction{num: n, den: d}  ), do: n / d
+    def inverse(  %Fraction{num: n, den: d}  ), do: Fraction.new(d, n)
     def compare(f1 = %Fraction{}, f2 = %Fraction{}) do
         case for n <- [f1, f2], do: Fraction.to_float(n) do
             [x, y] when x > y -> :gt
@@ -38,18 +34,22 @@ defmodule Fraction do
             _                 -> :eq
         end
     end
-
     def add(%Fraction{num: n1, den: d1}, %Fraction{num: n2, den: d2}) do
         Fraction.new((n1 * d2) + (n2 * d1), d1 * d2) |> Fraction.simplify()
     end
-
     def multiply(%Fraction{num: n1, den: d1}, %Fraction{num: n2, den: d2}) do
-        Fraction.new(n1 * n2, d1 * d2)
+        Fraction.new(n1 * n2, d1 * d2) |> Fraction.simplify()
     end
-
     def divide(f1, f2), do: Fraction.multiply(f1, Fraction.inverse(f2))
-
     def power(%Fraction{num: n, den: d}, power), do: Fraction.new(n ** power, d ** power)
+    def not_zero(%Fraction{num: n}), do: n != 0
+    def sign(%Fraction{num: n, den: d}) do
+        if (n < 0 and d < 0) or (n > 0 and d > 0) do
+            1
+        else
+            -1
+        end
+    end
 end
 
 defimpl String.Chars, for: Fraction do
