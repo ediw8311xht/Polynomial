@@ -28,3 +28,4 @@ mathproject-*.tar
 /tmp/
 
 /.elixir_ls/
+*.txt
