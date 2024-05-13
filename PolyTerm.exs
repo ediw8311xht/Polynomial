@@ -16,13 +16,8 @@ defmodule PolyTerm do
     def new(coe: c, var: v, exp: e),    do: PolyTerm.new(c, v, e)
     def new(s) when is_binary(s) do
         %{"coe" => c, "frac" => f, "var" => v, "exp" => e} = Regex.named_captures(@group_regex, s)
-        #a = [Helper.parsebit(c), v, (if v == "", do: 1, else: Helper.parsebit(e))]
-        #Kernel.apply(PolyTerm, :new, a)
-        if v == "" do
-            PolyTerm.new(Fraction.new(c <> f), "", 0)
-        else
-            PolyTerm.new(Fraction.new(c <> f), v, Helper.toint(e))
-        end
+        a = [Helper.toint(c), v, (if v == "", do: 0, else: Helper.toint(e))]
+        Kernel.apply(PolyTerm, :new, a)
     end
 
     def degree(%PolyTerm{exp: e}), do: e

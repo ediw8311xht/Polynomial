@@ -10,6 +10,7 @@ defmodule Fraction do
     def new(n, d),      do: %Fraction{num: n, den: d} |> Fraction.simplify()
     def new([n, d]),    do: Fraction.new(n, d)
     def new(n) when is_integer(n),   do: Fraction.new(n, 1)
+    def new(""),                     do: Fraction.new(0, 1)
     def new(s) when is_binary(s) do
         String.split(s, "/")
         |> Stream.map(&String.trim/1)

@@ -24,8 +24,8 @@ defmodule Main do
         #|> IO.puts()
     end
     def main(_) do
-        num = Polynomial.new("7x^5 8x^4")
-        den = Polynomial.new("5x + 4")
+        num = Polynomial.new("2x^3 + -3x^2 + 4x + 5")
+        den = Polynomial.new("x + 2")
         #den
         Polynomial.divide(num, den)
         #Polynomial.subtract(num, den)
