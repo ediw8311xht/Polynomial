@@ -41,10 +41,9 @@ defmodule PolyTerm do
     end
 
     def add(%PolyTerm{var: v1, exp: e1}, %PolyTerm{var: v2, exp: e2}) when v1 != v2 or e1 != e2, do: :nil
-    def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, exp: e2}) do
+    def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, exp: _e2}) do
         sum = Fraction.add(c1, c2)
         if Fraction.not_zero(sum) do
-            IO.inspect({Fraction.add(c1, c2), v1, e1})
             PolyTerm.new(Fraction.add(c1, c2), v1, e1)
         else
             PolyTerm.new(0, "", 0)

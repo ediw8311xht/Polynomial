@@ -65,15 +65,18 @@ defmodule Polynomial do
     end
 
     #------------DIVISION---------#
-    def divide(p1 = %Polynomial{}, p2 = %Polynomial{}) do
-        s1 = simplify(p1);     s2 = simplify(p2)
+    def divide(s1 = %Polynomial{}, s2 = %Polynomial{}) do
+        {res, rem} = internal_divide(simplify(s1), simplify(s2))
+        %{res: res, rem: rem}
+    end
+    defp internal_divide(s1 = %Polynomial{}, s2 = %Polynomial{}) do
         l1 = leading_term(s1); l2 = leading_term(s2)
         if l1 == :nil or l2 == :nil or l1.exp == 0 do
             {false, s1}
         else
             quotient = PolyTerm.divide(l1, l2)
             remainder = Polynomial.subtract(s1, Polynomial.multiply(quotient, s2))
-            case divide(remainder, s2) do
+            case internal_divide(remainder, s2) do
                 {false, r} ->
                     {Polynomial.new([quotient]), r}
                 {q, r} ->

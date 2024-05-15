@@ -24,42 +24,13 @@ defmodule Main do
         #|> IO.puts()
     end
     def main(_) do
-        num = Polynomial.new("x^2 -5x -2")
-        den = Polynomial.new("x -3")
-        #den
-        {x, y} = Polynomial.divide(num, den)
-        IO.puts("HI")
-        IO.puts(x)
-        IO.puts(y)
-        #IO.inspect(y)
-        #Polynomial.subtract(num, den)
-        #IO.puts(Polynomial.simplify(num))
-        #Polynomial.simplify(den)
-        #Polynomial.multiply(a, den)
-        #num = PolyTerm.new("8")
-        #Polynomial.new("5")
-        #|> IO.puts()
-        #[Polynomial.leading_term(num), Polynomial.leading_term(den)]
-        #Polynomial.leading_term(test1)
-        #l1 = Polynomial.leading_term(num)
-        #l2 = Polynomial.leading_term(den)
-        #PolyTerm.divide(l1, l2)
-
-        #|> Polynomial.simplify()
-        #|> IO.puts()
-        #a = Fraction.new(-15, 5)
-        #b = Fraction.new(15, 5)
-        #Fraction.add(b, a)
-        #Helper.gcf([15, 5])
-        #Enum.min([15, 5])..1//-1
-        #Enum.min([15, 5])
-        #Helper.simplify_by_gcf([15, 5])
-        #|> Fraction.simplify()
-        #Helper.is_factor([15, 5], 3)
-        #IO.puts("HI")
+        num = Polynomial.new("3x^2 3x")
+        den = Polynomial.new("3x 3")
+        %{res: res, rem: rem} = Polynomial.divide(num, den)
+        IO.puts(res)
+        IO.puts(rem)
     end
 end
 
 System.argv()
 |> Main.main()
-|> IO.inspect()
