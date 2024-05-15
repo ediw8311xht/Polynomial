@@ -20,7 +20,8 @@ defmodule Polynomial do
         |> Polynomial.new()
     end
 
-    def leading_term(%Polynomial{figures: figs}), do: Enum.max_by(figs, &(&1.exp))
+    def leading_term( %Polynomial{figures: []}   ), do: :nil
+    def leading_term( %Polynomial{figures: figs} ), do: Enum.max_by(figs, &(&1.exp))
 
     def combine(%Polynomial{figures: figs1}, %Polynomial{figures: figs2}) do
         Polynomial.new(figs1 ++ figs2) |> Polynomial.simplify()
@@ -52,7 +53,7 @@ defmodule Polynomial do
     end
 
     def multiply(%Polynomial{figures: figs}, poly2 = %Polynomial{}) do
-        Enum.reduce(figs, Polynomial.new(), fn term, acc -> 
+        Enum.reduce(figs, Polynomial.new(), fn term, acc ->
             Polynomial.combine(acc, Polynomial.multiply(term, poly2))
         end)
         |> Polynomial.new()
@@ -64,29 +65,17 @@ defmodule Polynomial do
     end
 
     #------------DIVISION---------#
-    def divide(p1 = %Polynomial{}, p2 = %Polynomial{}), do: divide_step(simplify(p1), simplify(p2))
-
-    #defp internal_divide(s1 = %Polynomial{}, s2 = %Polynomial{}, result \\ %Polynomial{figures: []}) do
-    #    case divide_step(s1, s2) do
-    #        {true,  quotient, remainder} -> 
-    #            Polynomial.combine(result, quotient)
-    #            |> internal_divide(remainder, s2)
-    #        {false, x} -> 
-    #            Polynomial.combine(result, x)
-    #    end
-    #end
-
-    defp divide_step(s1 = %Polynomial{}, s2 = %Polynomial{}) do
+    def divide(p1 = %Polynomial{}, p2 = %Polynomial{}) do
+        s1 = simplify(p1);     s2 = simplify(p2)
         l1 = leading_term(s1); l2 = leading_term(s2)
-        if l1.exp < l2.exp do
-            {false, Polynomial.simplify(s1)}
+        if l1 == :nil or l2 == :nil or l1.exp == 0 do
+            {false, s1}
         else
             quotient = PolyTerm.divide(l1, l2)
             remainder = Polynomial.subtract(s1, Polynomial.multiply(quotient, s2))
-            IO.inspect({"G", remainder})
-            case divide_step(remainder, s2) do
+            case divide(remainder, s2) do
                 {false, r} ->
-                    {Polynomial.new([quotient]), Polynomial.combine(remainder, r)}
+                    {Polynomial.new([quotient]), r}
                 {q, r} ->
                     {Polynomial.add(q, quotient), r}
             end

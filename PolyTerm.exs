@@ -10,10 +10,16 @@ defmodule PolyTerm do
     @def_exp 1
     defstruct coe: 1, var: "", exp: 1
 
-    def new(c = %Fraction{}, v, e),     do: %PolyTerm{coe: c, var: v, exp: e}
+    def new(c = %Fraction{}, v, e) do
+        #%PolyTerm{coe: c, var: v, exp: e}
+        if e == 0 do
+            %PolyTerm{coe: c, var: "", exp: e}
+        else
+            %PolyTerm{coe: c, var: v, exp: e}
+        end
+    end
     def new(c, v, e) when is_number(c), do: PolyTerm.new(Fraction.new(c), v, e)
     def new(c, v),                      do: PolyTerm.new(c, v, @def_exp)
-    def new(coe: c, var: v, exp: e),    do: PolyTerm.new(c, v, e)
     def new(s) when is_binary(s) do
         %{"coe" => c, "frac" => f, "var" => v, "exp" => e} = Regex.named_captures(@group_regex, s)
         a = [Fraction.new(Helper.toint(c), f), v, (if v == "", do: 0, else: Helper.toint(e))]
@@ -38,6 +44,7 @@ defmodule PolyTerm do
     def add(%PolyTerm{coe: c1, var: v1, exp: e1}, %PolyTerm{coe: c2, exp: e2}) do
         sum = Fraction.add(c1, c2)
         if Fraction.not_zero(sum) do
+            IO.inspect({Fraction.add(c1, c2), v1, e1})
             PolyTerm.new(Fraction.add(c1, c2), v1, e1)
         else
             PolyTerm.new(0, "", 0)
@@ -65,7 +72,7 @@ end
 
 defimpl String.Chars, for: PolyTerm do
     def to_string(poly) do
-        c = if poly.coe == 1, do: "", else: String.Chars.to_string(poly.coe)
+        c = if Fraction.to_float(poly.coe) == 1, do: "", else: String.Chars.to_string(poly.coe)
         v = if poly.exp == 0, do: "", else: poly.var
         e = if poly.exp == 1 or poly.exp == 0, do: "", else: "^" <> String.Chars.to_string(poly.exp)
         c <> v <> e
